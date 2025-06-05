@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hex Calculator + Feedback Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      padding: 40px;
+      margin: 0;
+      transition: background-color 0.5s, color 0.5s;
+      color: #2c3e50;
+    }
+    body.night {
+      background: #2c3e50;
+      color: #ecf0f1;
+    }
+    .calculator {
+      max-width: 400px;
+      margin: auto 0 30px;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      transition: background-color 0.5s, color 0.5s;
+      margin: 15px auto;
+    }
+    body.night .calculator {
+      background: #34495e;
+      color: #ecf0f1;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1.5px solid #ccc;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, select:focus, button:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      color: #2c3e50;
+    }
+    body.night #result {
+      color: #ecf0f1;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      background: #eee;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #555;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    body.night footer {
+      background: #34495e;
+      color: #bdc3c7;
+    }
+
+    /* Модальне тло */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    /* Модальне вікно */
+    .modal {
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px 40px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      position: relative;
+      color: #2c3e50;
+      font-size: 16px;
+    }
+    body.night .modal {
+      background: #34495e;
+      color: #ecf0f1;
+    }
+
+    /* Закриття */
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #888;
+      transition: color 0.3s ease;
+    }
+    .modal-close:hover {
+      color: #333;
+    }
+    body.night .modal-close:hover {
+      color: #ddd;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: inherit;
+    }
+
+    form input[type="email"],
+    form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+      color: inherit;
+      background: #fff;
+    }
+    body.night form input[type="email"],
+    body.night form textarea {
+      background: #2c3e50;
+      border-color: #555;
+      color: #ecf0f1;
+    }
+    form input[type="email"]:focus,
+    form textarea:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    form textarea {
+      min-height: 100px;
+    }
+
+    form button[type="submit"] {
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+    form button[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+
+    /* Перемикач теми */
+    #themeSwitcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #3498db;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      z-index: 1100;
+    }
+    #themeSwitcher:hover {
+      background-color: #2980b9;
+    }
+
+    /* Коментарі */
+    #comments {
+      max-width: 800px;
+      margin: 20px auto 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 20px;
+      color: #2c3e50; 
+    }
+    body.night #comments {
+      background: #34495e;
+      color: #ecf0f1;
+    }
+    #comments h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .comment {
+      border-bottom: 1px solid #ddd; 
+      padding: 10px 0;
+    }
+    .comment:last-child {
+      border: none;
+    }
+    .comment strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="themeSwitcher" aria-label="Переключити тему">🌞/🌜</button>
+
+  <div class="calculator" role="main" aria-label="HEX калькулятор">
+    <h2>Калькулятор (16-кова система)</h2>
+    <label for="hex1">Число 1 (HEX):</label>
+    <input type="text" id="hex1" placeholder="Наприклад: A3" aria-describedby="hex1desc" />
+    <small id="hex1desc">Введіть шістнадцяткове число (0-9, A-F)</small>
+
+    <label for="operator">Операція:</label>
+    <select id="operator" aria-describedby="operatorDesc">
+      <option value="+">Додати</option>
+      <option value="-">Відняти</option>
+      <option value="*">Множити</option>
+      <option value="/">Ділити</option>
+    </select>
+    <small id="operatorDesc">Оберіть арифметичну операцію</small>
+
+    <label for="hex2">Число 2 (HEX):</label>
+    <input type="text" id="hex2" placeholder="Наприклад: 1F" aria-describedby="hex2desc" />
+    <small id="hex2desc">Введіть шістнадцяткове число (0-9, A-F)</small>
+
+    <button onclick="calculateHex()" aria-live="polite" aria-atomic="true">Обчислити</button>
+
+    <div id="result" role="region" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <section id="comments" aria-label="Коментарі">
+    <h3>Коментарі (варіант 3)</h3>
+    <div id="commentsContainer">
+      Завантаження коментарів...
+    </div>
+  </section>
+
+  <footer aria-label="Збережені дані">
+    <h3>Збережені дані у localStorage</h3>
+    <div>
+      <strong>hex1:</strong> <span id="storageHex1">не збережено</span><br/>
+      <strong>operator:</strong> <span id="storageOperator">не збережено</span><br/>
+      <strong>hex2:</strong> <span id="storageHex2">не збережено</span><br/>
+      <strong>result:</strong> <span id="storageResult">не збережено</span>
+    </div>
+  </footer>
+
+  <!-- Модальне вікно -->
+  <div class="modal-overlay" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <button class="modal-close" id="closeModal" aria-label="Закрити форму">&times;</button>
+      <h2 id="modalTitle">Форма зворотного зв’язку</h2>
+
+      <form action="https://formspree.io/f/xqabkqpg" method="POST">
+        <label>
+          Your email:
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>
+          Your message:
+          <textarea name="message" required></textarea>
+        </label>
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+<script>
+  // Функція для обчислення в HEX
+  function calculateHex() {
+    const hex1Input = document.getElementById('hex1');
+    const hex2Input = document.getElementById('hex2');
+    const operator = document.getElementById('operator').value;
+    const resultEl = document.getElementById('result');
+
+    let hex1 = hex1Input.value.trim().toUpperCase();
+    let hex2 = hex2Input.value.trim().toUpperCase();
+
+    // Перевірка валідності HEX (0-9, A-F)
+    const validHex = /^[0-9A-F]+$/;
+    if (!validHex.test(hex1)) {
+      resultEl.textContent = 'Перше число не є валідним HEX числом.';
+      return;
+    }
+    if (!validHex.test(hex2)) {
+      resultEl.textContent = 'Друге число не є валідним HEX числом.';
+      return;
+    }
+
+    let num1 = parseInt(hex1, 16);
+    let num2 = parseInt(hex2, 16);
+    let res;
+
+    switch (operator) {
+      case '+': res = num1 + num2; break;
+      case '-': res = num1 - num2; break;
+      case '*': res = num1 * num2; break;
+      case '/':
+        if (num2 === 0) {
+          resultEl.textContent = 'Ділення на нуль неможливе.';
+          return;
+        }
+        res = Math.floor(num1 / num2);
+        break;
+      default:
+        resultEl.textContent = 'Невідома операція.';
+        return;
+    }
+
+    // Відобразити результат у HEX, великими літерами
+    let resHex = res.toString(16).toUpperCase();
+
+    // Зберегти у localStorage
+    localStorage.setItem('hex1', hex1);
+    localStorage.setItem('operator', operator);
+    localStorage.setItem('hex2', hex2);
+    localStorage.setItem('result', resHex);
+
+    // Відобразити результат
+    resultEl.textContent = `Результат: ${resHex}`;
+    updateFooter();
+  }
+
+  // Відобразити збережені дані у футері
+  function updateFooter() {
+    document.getElementById('storageHex1').textContent = localStorage.getItem('hex1') || 'не збережено';
+    document.getElementById('storageOperator').textContent = localStorage.getItem('operator') || 'не збережено';
+    document.getElementById('storageHex2').textContent = localStorage.getItem('hex2') || 'не збережено';
+    document.getElementById('storageResult').textContent = localStorage.getItem('result') || 'не збережено';
+  }
+
+  updateFooter();
+
+  // Модальне вікно - показ через 1 хвилину
+  setTimeout(() => {
+    document.getElementById('feedbackModal').style.display = 'flex';
+  }, 6000);
+
+  // Закриття модалки
+  document.getElementById('closeModal').addEventListener('click', () => {
+    document.getElementById('feedbackModal').style.display = 'none';
+  });
+
+  // Закриття при кліку поза модалкою
+  document.getElementById('feedbackModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.style.display = 'none';
+    }
+  });
+
+  // Перемикач теми: ніч/день
+  const themeSwitcher = document.getElementById('themeSwitcher');
+
+  function setTheme(isNight) {
+    if (isNight) {
+      document.body.classList.add('night');
+    } else {
+      document.body.classList.remove('night');
+    }
+  }
+
+  function toggleTheme() {
+    const isNight = document.body.classList.contains('night');
+    setTheme(!isNight);
+  }
+
+  themeSwitcher.addEventListener('click', toggleTheme);
+
+  // Автоматичний вибір теми за часом (20:00 - 7:00 нічна)
+  function autoTheme() {
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour >= 20 || hour < 7) {
+      setTheme(true);
+    } else {
+      setTheme(false);
+    }
+  }
+
+  autoTheme();
+
+  // Запит коментарів з JSONPlaceholder (замініть варіант 1 на свій, якщо потрібно)
+  async function fetchComments() {
+    try {
+      const res = await fetch('https://jsonplaceholder.typicode.com/comments?postId=3');
+      if (!res.ok) throw new Error('Помилка при завантаженні коментарів');
+      const comments = await res.json();
+
+      const container = document.getElementById('commentsContainer');
+      container.innerHTML = '';
+      comments.forEach(c => {
+        const div = document.createElement('div');
+        div.classList.add('comment');
+        div.innerHTML = `<strong>${c.name} (${c.email}):</strong><p>${c.body}</p>`;
+        container.appendChild(div);
+      });
+    } catch (error) {
+      document.getElementById('commentsContainer').textContent = 'Не вдалося завантажити коментарі.';
+      console.error(error);
+    }
+  }
+
+  fetchComments();
+</script>
+
+</body> 
+</html> 
